@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+<head>
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="palestine_cities_app">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- Leaflet CSS and JS (instead of Google Maps) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" 
+   integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+   crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+   integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+   crossorigin=""></script>
+   
+  <style>
+    html {
+      height: 100%;
+      width: 100%;
+    }
+    
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    #map {
+      height: 100%; 
+      width: 100%;
+      border-radius: 8px;
+    }
+    
+    .leaflet-popup-content {
+      text-align: center;
+      font-family: 'Arial', sans-serif;
+    }
+    
+    .leaflet-popup-content b {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
+  
+  <title>Palestine Cities App</title>
+  <link rel="manifest" href="manifest.json">
+  
+  <script>
+    // Map initialization function - called only when map is shown
+    function initializeMap() {
+      // If map is already initialized, don't do it again
+      if (window.flutterMapController) return;
+      
+      // Initialize the map centered on Palestine
+      var map = L.map('map').setView([31.9522, 35.2332], 8);
+      
+      // Add the OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Define city data
+      var cities = [
+        { name: "Jerusalem", arabicName: "القدس", coords: [31.7683, 35.2137] },
+        { name: "Gaza", arabicName: "غزة", coords: [31.5204, 34.4667] },
+        { name: "Hebron", arabicName: "الخليل", coords: [31.5326, 35.0998] },
+        { name: "Jericho", arabicName: "أريحا", coords: [31.8667, 35.4500] },
+        { name: "Bethlehem", arabicName: "بيت لحم", coords: [31.7054, 35.2024] },
+        { name: "Nablus", arabicName: "نابلس", coords: [32.2211, 35.2544] },
+        { name: "Ramallah", arabicName: "رام الله", coords: [31.9038, 35.2034] }
+      ];
+      
+      // Add markers for each city
+      cities.forEach(function(city) {
+        L.marker(city.coords)
+          .addTo(map)
+          .bindPopup("<b>" + city.name + "</b><br>" + city.arabicName)
+          .on('click', function() {
+            // Center the map on the city when marker is clicked
+            map.setView(city.coords, 12);
+          });
+      });
+      
+      // Resize the map to fit the container properly
+      setTimeout(function() {
+        map.invalidateSize();
+      }, 100);
+      
+      // Make the map accessible to Flutter
+      window.flutterMapController = {
+        map: map,
+        focusCity: function(lat, lng) {
+          map.setView([lat, lng], 12);
+        },
+        resetView: function() {
+          map.setView([31.9522, 35.2332], 8);
+        }
+      };
+    }
+    
+    // This prevents zooming when double-tapping the map on mobile
+    window.addEventListener('load', function() {
+      document.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 1) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    });
+  </script>
+  
+  <!-- Flutter's JavaScript -->
+  <script src="flutter.js" defer></script>
+</head>
+<body>
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Try to load main.dart.js
+      var scriptTag = document.createElement('script');
+      scriptTag.src = 'main.dart.js';
+      scriptTag.type = 'application/javascript';
+      
+      scriptTag.addEventListener('load', function() {
+        console.log('Flutter app script loaded successfully');
+      });
+      
+      scriptTag.addEventListener('error', function(e) {
+        console.error('Failed to load Flutter app script:', e);
+      });
+      
+      document.body.appendChild(scriptTag);
+    });
+  </script>
+</body>
+</html>
+
+
